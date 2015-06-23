@@ -1,0 +1,1 @@
+console.error("SyntaxError: /Users/benjaminhoward/Desktop/Github Projects/Iron Yard/8_week/to_do_list/js/app-browserify.js: Unexpected token (29:48) while parsing file: /Users/benjaminhoward/Desktop/Github Projects/Iron Yard/8_week/to_do_list/js/app-browserify.js");
