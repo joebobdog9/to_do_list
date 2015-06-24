@@ -16,8 +16,9 @@ window.Task = Task
 
 import $ from 'jquery'
 
+Parse = window.Parse
 Parse.$ = $
-Parse.initialize("57KkEoyo9i0avbjMO3shJ7eia0Fdf7W3gjxeJ4La", "0Nx7vBI1q0sb5ygxtGVVubJrTgVmGT4zihggDXtc")
+Parse.initialize("1oEEynw3WvfBGuA3JDWqO7jwgwxTkXdx5yr9bsyd", "im5rJtvJxi4vlaSvkeB2ciKZZ0dAWu8iUywBmmhe")
 
 
 // singleton
@@ -50,6 +51,18 @@ class TaskView extends React.Component {
             model.set('progress', 'upcoming')
         }
     }
+
+     _toggleUrgent(e){
+        console.log(this.refs.urgentBox.getDOMNode())
+        console.log(this.refs.urgentBox.getDOMNode().checked)
+        var model = this.props.data
+        var urgency = model.get('isUrgent')
+        if(urgency !== true) {
+            model.set('isUrgent', true)
+        } else {
+            model.set('isUrgent', false)
+        }
+    }
     _saveTitle(){
         var text = React.findDOMNode(this.refs.title).innerText
         this.props.data.set('title', text)
@@ -58,11 +71,15 @@ class TaskView extends React.Component {
         var model = this.props.data
         return (<li className={ model.get('progress') }>
             <p contentEditable ref="title" onBlur={() => this._saveTitle()}>{model.get('title')}</p>
-            <input type="checkbox"
+            <input className="doneBox" type="checkbox"
                 checked={model.get('progress') === 'done'}
                 onChange={() => this._toggleDone()} />
             <div>
-                <input type="checkbox" checked={model.get('isUrgent')} /> <span className="urgent"> urgent </span>
+                <input className="urgentBox" ref="urgentBox" type="checkbox" 
+                checked={model.get('isUrgent')}
+                onChange={(e) => this._toggleUrgent(e)} /> 
+
+                <span className="urgent"> urgent </span>
                 <input type="date" />
             </div>
         </li>)
@@ -86,7 +103,8 @@ class ListView extends React.Component {
         var model = new Task({ title: input.value })
         var acl = new Parse.ACL()
         acl.setWriteAccess(Parse.User.current(), true)
-        acl.setPublicReadAccess(true)
+        acl.setReadAccess(Parse.User.current(), true)
+        acl.setPublicReadAccess(false)
         model.setACL(acl)
         this.props.data.create(model)
         input.value = ''
@@ -153,6 +171,16 @@ var Router = Parse.Router.extend({
         '*default': 'login'
     },
     initialize: () => {
+        console.log('router?')
+        // var newModel = new Task({
+        //     title: ('sweet ddooode'),
+        //     due_date: "12/25/15",
+        //     location: 'far',
+        //     progress: 'upcoming',
+        //     isUrgent: false
+        // })
+
+
         Parse.history.start()
     },
     list: () => {

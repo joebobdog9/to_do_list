@@ -133,8 +133,6 @@ ul {
     li {
         color: #ffffff;
         font-family: helvetica;
-        font-size: 2rem;
-        
         border-bottom: 1px solid #FFFFFF;
         background: #0066dd;
         position: relative;
@@ -149,27 +147,30 @@ ul {
             margin-top: 1rem;
         }
 
-        div {
-            margin-left: .5rem;
-        
 
-        .urgent{
-            font-size: .75rem;
-            font-style: italic;
-            margin-left: .5rem;
-        }
-                input[type="date"] {
-                    color: #808284;
+        div {
+            margin-left: .5rem;        
+
+            .urgent{
+                font-size: .75rem;
+                font-style: italic;
+                margin-left: .25rem;
+            }   
+                 input[type="date"] {
+                    
+                    color: #0066dd;
+                    margin-bottom: .5rem;
+                    margin-left: .5rem;
+                    font-size: .75rem;
                     border: none;
-                     margin: 1rem;
-                    font-weight: normal;
-                    font-size: .5rem;
-                }
+                 }
         }
-                    p {
-                        margin: .5rem;
-                        font-weight: bold;
-                    }
+                 
+                 p {
+                    margin: .5rem;
+                    font-weight: bold;
+                    font-size: 2rem;
+                 }
 
         &.done {
             background: #ffffff;
