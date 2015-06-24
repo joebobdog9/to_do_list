@@ -1,12 +1,9 @@
-
-"use strict";
+// "use strict";
 
 // es5 polyfills, powered by es5-shim
 require("es5-shim")
 // es6 polyfills, powered by babel
 require("babel/register")
-
-
 
 // var Promise = require('es6-promise').Promise
 // equivalent to...
@@ -14,20 +11,28 @@ import {Promise} from 'es6-promise'
 import Backbone from 'backbone'
 import React from 'react'
 import {Task, Tasks} from './task'
-//parse 
-Parse.initialize("1oEEynw3WvfBGuA3JDWqO7jwgwxTkXdx5yr9bsyd", "im5rJtvJxi4vlaSvkeB2ciKZZ0dAWu8iUywBmmhe");
+
+window.Task = Task
+
+import $ from 'jquery'
+
+Parse.$ = $
+Parse.initialize("57KkEoyo9i0avbjMO3shJ7eia0Fdf7W3gjxeJ4La", "0Nx7vBI1q0sb5ygxtGVVubJrTgVmGT4zihggDXtc")
 
 
-const list = new Tasks([
-    list.query = new Parse.Query(Task),
-    // list.fetch();
-])
+// singleton
+const list = new Tasks()
+list.query = new Parse.Query(Task)
+
+// setInterval(() => list.fetch(), 15*1000)
 
 class TaskView extends React.Component {
     constructor(props){
         super(props)
-        this.rerender = () => this.forceUpdate(){
-            // this.save()
+        this.rerender = () => {
+            console.log('trying to save')
+            this.props.data.save()
+            this.forceUpdate()
         }
     }
     componentDidMount(){
@@ -57,7 +62,7 @@ class TaskView extends React.Component {
                 checked={model.get('progress') === 'done'}
                 onChange={() => this._toggleDone()} />
             <div>
-                <input type="checkbox" checked={model.get('isUrgent')} />
+                <input type="checkbox" checked={model.get('isUrgent')} /> <span className="urgent"> urgent </span>
                 <input type="date" />
             </div>
         </li>)
@@ -77,13 +82,14 @@ class ListView extends React.Component {
     }
     _add(e){
         e.preventDefault()
-        var model = new Task({ title: input.value})
-        var acl = new Parse(acl)
         var input = React.findDOMNode(this.refs.title)
-        this.props.data.add({ title: input.value })
-        input.value = ''
-        // acl.setWriteAccess()
+        var model = new Task({ title: input.value })
+        var acl = new Parse.ACL()
+        acl.setWriteAccess(Parse.User.current(), true)
+        acl.setPublicReadAccess(true)
         model.setACL(acl)
+        this.props.data.create(model)
+        input.value = ''
     }
     render(){
         return (<div>
@@ -101,75 +107,71 @@ class ListView extends React.Component {
 class LoginView extends React.Component {
     constructor(props){
         super(props)
+        this.state = { error: 0 }
     }
+    _signupOrLogin(e){
+        e.preventDefault()
 
-    _signupOrLogin(){
-        var user = new Parse.User(),
-            email = React.findDOMNode(this.refs.email).value
+        var u = new Parse.User(),
+            email = React.findDOMNode(this.refs.email).value,
             password = React.findDOMNode(this.refs.password).value
 
+        u.set({
+            email: email,
+            password: password,
+            username: email
+        })
 
-    user.set({
-        email: email,
-        password: password,
-        username: email
-    })
-
-    var signup = user.signup()
-        signup.then(()=> window.location.hash = '#list')
-        signup.fail(()=> { 
-            var loging = user.login()
-            login.then((e)=> window.location.hash = '#list')
-            login.fail((...args)=> {
-                this.setState({error:this.state.error *1 
-                })
+        var signup = u.signUp()
+        signup.then(() => window.location.hash = '#list')
+        signup.fail(() => {
+            var login = u.logIn()
+            login.then((e) => window.location.hash = '#list')
+            login.fail((...args) => {
+                this.setState({error: this.state.error + 1 })
             })
-
-        }
-
-    render(){
-        return(<div>
-            <form onSubmit={(e>) => this.signupOrLogin(e)}>
-            <p> Login or Register </p>
-            <hr>
-                <input type="email" ref="email" placeholder="email address" /> <div>
-
-                <input type="password" ref="password" placeholder="password" /> </div>
-                {error}
-                <div> <button> Submit </button> </div>
-            </form>    
-            )
-        }
+        })
     }
+    render(){
+        var error = this.state.error ? (<p className="error-message">{this.state.error} try - password invalid</p>) : ''
+        return (<div>
+            <form onSubmit={(e) => this._signupOrLogin(e)}>
+                <p> login or register: </p>
+                <hr />
+                <div><input type="email" ref="email" placeholder="email address" /></div>
+                <div><input type="password" ref="password" placeholder="password" /></div>
+                {error}
+                <div><button>submit</button></div>
+            </form>
+        </div>)
+    }
+}
 
-
-React.render(<ListView data={list} />, document.querySelector('.container'))
-window.list = list
-
-var router = Parse.Router.extende({
+var Router = Parse.Router.extend({
     routes: {
-        'list' : 'list',
+        'list': 'list',
         '*default': 'login'
     },
-    initialize () => {
+    initialize: () => {
         Parse.history.start()
     },
-
-
-    list() => {
-        if (!Parse.User.current()){
-            window.locatuon.hash = '#login'
+    list: () => {
+        if(!Parse.User.current()){
+            window.location.hash = '#login'
+            return
         }
+
+        list.fetch()
         React.render(<ListView data={list} />, document.querySelector('.container'))
     },
-    login() => {
-         window.locatuon.hash = '#list'
-     }
-        React.render(<LoginView/>, document.querySelector('.container'))
+    login: () => {
+        if(Parse.User.current()){
+            window.location.hash = '#list'
+            return
+        }
+
+        React.render(<LoginView />, document.querySelector('.container'))
     }
 })
 
-
-
-
-
+var router = new Router()

@@ -88,21 +88,33 @@ img {
  * YOUR CODE HERE
  */
 
- container {
+ .container {
     max-width: 400px;
+    margin: 2rem;
+     form {
+            font-family: helvetica;
+    
+       input[type="email"] {
+        color: #0066dd;
 
- }
+       }
+    }   
+}
+
 
  form {
     position: relative;
 
 
     & > div {
+        position: relative;
         margin-right: 3rem;
+        margin-top: 1rem;
             input {
                 width: 100%;
                 font-family: helvetica;
                 color: #808284;
+
             }
         }
         button {
@@ -111,6 +123,7 @@ img {
             right: 0;
             width: 2.5rem;
             line-height: 1.25rem;
+            background-color: none;
             }
         }
     
@@ -121,31 +134,43 @@ ul {
         color: #ffffff;
         font-family: helvetica;
         font-size: 2rem;
-        font-weight: bold;
+        
         border-bottom: 1px solid #FFFFFF;
         background: #0066dd;
         position: relative;
+
         & > input[type="checkbox"] {
             position: absolute;
             top: 0;
             right: 0;
             width: 1rem;
             height: 1rem;
-            margin: .5rem;
-        }
-        input[type="date"] {
-            color: #808284;
-            border: none;
-             margin: 1rem;
-            font-weight: normal;
-            font-size: .5rem;
-
-
+            margin-right: 1rem;
+            margin-top: 1rem;
         }
 
-        p {
-            margin-left: .5rem
+        div {
+            margin-left: .5rem;
+        
+
+        .urgent{
+            font-size: .75rem;
+            font-style: italic;
+            margin-left: .5rem;
         }
+                input[type="date"] {
+                    color: #808284;
+                    border: none;
+                     margin: 1rem;
+                    font-weight: normal;
+                    font-size: .5rem;
+                }
+        }
+                    p {
+                        margin: .5rem;
+                        font-weight: bold;
+                    }
+
         &.done {
             background: #ffffff;
             color: #0066dd;
@@ -156,8 +181,11 @@ ul {
             }
             input[type="date"] {
                 display: none;
+                margin-right: 1rem;
 
             }
+
+            
 
 
         }
